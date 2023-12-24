@@ -5,7 +5,6 @@ if [ $# != 1 ]; then
   exit 1
 fi
 
-
 SCRIPTS_FOLDER=/cs/labs/ravehb/roi.eliasian/NpcTransportExperiment/HS-AFM-Dataset/scripts/
 
 length=$(jq length ${1})
