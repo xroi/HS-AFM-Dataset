@@ -16,7 +16,7 @@ source /cs/labs/ravehb/ravehb/External/venv_imp2023_v2/bin/activate.csh
 set OUTPUT_PATH=$4/
 set CONFIG_PATH=$5
 set seed=`od -An -N4 -td4 /dev/random`
-SCRIPTS_FOLDER=/cs/labs/ravehb/roi.eliasian/NpcTransportExperiment/HS-AFM-Dataset/scripts/
+set SCRIPTS_FOLDER=/cs/labs/ravehb/roi.eliasian/NpcTransportExperiment/HS-AFM-Dataset/scripts/
 
 
 mkdir -p $OUTPUT_PATH
