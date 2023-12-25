@@ -2,5 +2,5 @@ IMP_FOLDER=/cs/labs/ravehb/ravehb/imp/fast_conda2/
 IMP=$IMP_FOLDER/setup_environment.sh
 source /cs/labs/ravehb/ravehb/External/venv_imp2023_v2/bin/activate
 
-$IMP python3 load_whole_new_coarse_grained_v15.py 200uM_full.pb 47-35_1spoke.rmf3 --params_file load.params --n_diffusers 964 --n_kap_interaction_sites 5 --diffusers_radii [60]
+$IMP python3 load_whole_new_coarse_grained_v15.py 200uM_full.pb 47-35_1spoke.rmf3 --params_file load.params --n_diffusers 964 --n_kap_interaction_sites 5 --diffusers_radii 60
 $IMP python3 load_whole_new_coarse_grained_v15.py 0uM_full.pb 47-35_1spoke.rmf3 --params_file load.params --n_diffusers 0
