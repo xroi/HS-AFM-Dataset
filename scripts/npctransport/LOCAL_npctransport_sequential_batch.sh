@@ -22,8 +22,8 @@ SCRIPTS_FOLDER=/cs/labs/ravehb/roi.eliasian/NpcTransportExperiment/HS-AFM-Datase
 mkdir -p $OUTPUT_PATH
 
 declare -a IDs=()
-IDs+=$((${SLURM_ARRAY_TASK_ID} * 2 - 1))
-IDs+=$((${SLURM_ARRAY_TASK_ID} * 2))
+IDs+=($((${SLURM_ARRAY_TASK_ID} * 2 - 1)))
+IDs+=($((${SLURM_ARRAY_TASK_ID} * 2)))
 echo IDs: ${IDs[@]}
 
 echo "Running jobs"
