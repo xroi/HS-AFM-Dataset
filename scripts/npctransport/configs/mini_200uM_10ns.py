@@ -1,4 +1,4 @@
-#!/usr/bin/python
+mini_200uM_1ns.py#!/usr/bin/python
 from IMP.npctransport import *
 import sys
 import itertools

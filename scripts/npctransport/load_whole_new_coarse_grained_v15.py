@@ -793,19 +793,20 @@ def get_basic_config(cmdline_args):
     config.slack.lower = 10
     config.number_of_trials = 1
     config.angular_D_factor.lower = 0.3  # increased dynamic viscosity relative to water
-    config.statistics_interval_ns = 1.0
-    config.output_statistics_interval_ns = 10.0
     ###
     # simulation bounding volumes:
     config.box_is_on.lower = 1
     # config.dump_interval_ns=0.01
     # config.simulation_time_ns=5
-    config.dump_interval_ns = 1000
-    config.simulation_time_ns = 1000
+
     config.box_is_on.lower = 1
     config.box_side.lower = cmdline_args.box_size
 
     # Added by Roi
+    config.statistics_interval_ns = 0.1
+    config.dump_interval_ns = 1
+    config.simulation_time_ns = 100
+    config.output_statistics_interval_ns = 1.0
     config.xyz_stats_crop_factor = 1
     config.xyz_stats_voxel_size_a = 10
     config.xyz_stats_max_box_size_a = 700  # -> actually 800

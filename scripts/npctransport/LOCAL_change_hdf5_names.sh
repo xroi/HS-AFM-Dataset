@@ -14,4 +14,5 @@ for (( i=1 ; i<=${total} ; i++ ));
 do
   cur=$(((time - step) + (i * interval)))
   mv ${1}/${time}.pb.${i}.hdf5 ${1}/${cur}.hdf5
+  gzip ${1}/${cur}.hdf5
 done
