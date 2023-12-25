@@ -1,0 +1,10 @@
+{
+ "FGParams": {
+   "default_FSFG":{
+     "kap_k": 2.64
+   },
+   "default_GLFG":{
+     "kap_k": 2.64
+  }
+ }
+}
