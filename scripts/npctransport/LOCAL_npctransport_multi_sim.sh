@@ -9,6 +9,7 @@ SCRIPTS_FOLDER=/cs/labs/ravehb/roi.eliasian/NpcTransportExperiment/HS-AFM-Datase
 
 length=$(jq length ${1})
 
+
 for ((i=0; i<length; i++))
 do
   amount=$(jq ".[${i}].amount" ${1})
@@ -18,5 +19,5 @@ do
   stop=$(jq ".[${i}].stop" ${1})
   output_statistics_interval=$(jq ".[${i}].output_statistics_interval" ${1})
 
-  sbatch --array=1-$((${amount}/2)) --output=${output_path}/slurm ${SCRIPTS_FOLDER}/npctransport/LOCAL_npctransport_sequential_batch.sh ${output_path} ${config_path} ${step} ${output_statistics_interval} ${stop}
+  sbatch --array=1-$((${amount}/2)) ${SCRIPTS_FOLDER}/npctransport/LOCAL_npctransport_sequential_batch.sh ${output_path} ${config_path} ${step} ${output_statistics_interval} ${stop}
 done
