@@ -793,8 +793,8 @@ def get_basic_config(cmdline_args):
     config.slack.lower = 10
     config.number_of_trials = 1
     config.angular_D_factor.lower = 0.3  # increased dynamic viscosity relative to water
-    config.statistics_interval_ns = 10.0
-    config.output_statistics_interval_ns = 100.0
+    config.statistics_interval_ns = 1.0
+    config.output_statistics_interval_ns = 10.0
     ###
     # simulation bounding volumes:
     config.box_is_on.lower = 1
@@ -804,6 +804,14 @@ def get_basic_config(cmdline_args):
     config.simulation_time_ns = 1000
     config.box_is_on.lower = 1
     config.box_side.lower = cmdline_args.box_size
+
+    # Added by Roi
+    config.xyz_stats_crop_factor = 1
+    config.xyz_stats_voxel_size_a = 10
+    config.xyz_stats_max_box_size_a = 700  # -> actually 800
+    config.is_multiple_hdf5s = True
+    config.full_output_statistics_interval_factor = 100
+
     if IS_TOROID:
         config.slab_is_on.lower = 2
     else:
