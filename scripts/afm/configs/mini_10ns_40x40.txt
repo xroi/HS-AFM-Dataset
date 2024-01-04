@@ -21,7 +21,7 @@
 --no-calc-needle-threshold
 --calc-threshold-r-px 5
 --calc-threshold-frac 0.75
---tip-custom-threshold 0.01
+--tip-custom-threshold 0.001
 --tip-radius-px 1
 --floaters-resistance
 --fgs-sigma-a 117.738
