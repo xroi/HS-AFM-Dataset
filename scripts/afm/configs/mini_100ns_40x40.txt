@@ -1,0 +1,45 @@
+--no-npc-simulation
+--input-suffix .hdf5.gz
+--read-from-gzip
+--simulation-start-time-ns 20000
+--simulation-end-time-ns 1320000
+--interval-ns 100
+--voxel-size-a 10
+--tunnel-radius-a 185
+--slab-thickness-a 150
+--statistics-interval-ns 1
+--torus-slab
+--separate-n-c
+--min-x-coord 20
+--max-x-coord 60
+--min-y-coord 20
+--max-y-coord 60
+--min-z-coord 30
+--max-z-coord 80
+--no-vertical-scanning
+--z-func z_test
+--no-calc-needle-threshold
+--calc-threshold-r-px 5
+--calc-threshold-frac 0.75
+--tip-custom-threshold 0.01
+--tip-radius-px 1
+--floaters-resistance
+--fgs-sigma-a 117.738
+--floaters-sigma-a 96.369
+--floater-size-factor 1
+--floater-distribution-factor 1
+--floater-general-factor 3.7888
+--time-per-pixel-ns 100
+--time-between-scans-ns 0
+--no-output-real-time-gif
+--output-raster-gif
+--output-pickle
+--no-output-post
+--output-gif-color-map jet
+--no-output-hdf5
+--output-hdf5-path .
+--output_resolution_x 1000
+--output_resolution_y 1000
+--no-progress-bar
+--enlarge-floaters
+--n-cores 2
