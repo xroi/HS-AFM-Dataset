@@ -16,5 +16,5 @@ do
   output_path=$(jq -r ".[${i}].output_path" ${1})
   config_path=$(jq -r ".[${i}].config_path" ${1})
 
-  sbatch --array=1-$((${amount}/2)) ${SCRIPTS_FOLDER}/afm/LOCAL_afm_batch.sh ${input_path} ${output_path} ${config_path}
+  sbatch --array=1-$((${amount})) ${SCRIPTS_FOLDER}/afm/LOCAL_afm_batch.sh ${input_path} ${output_path} ${config_path}
 done
