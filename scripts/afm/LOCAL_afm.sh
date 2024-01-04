@@ -1,7 +1,6 @@
 #!/bin/csh -f
 #SBATCH --mem=4g
 #SBATCH --time=7-0
-#SBATCH --mail-type=ALL
 
 if ($#argv != 3) then
     echo "Syntax: $0 <input_folder_path> <output_prefix> <args_path>"
