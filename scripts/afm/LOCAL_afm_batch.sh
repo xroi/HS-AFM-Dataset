@@ -1,6 +1,8 @@
 #!/bin/csh -f
 #SBATCH --mem=2g
 #SBATCH --time=7-0
+#SBATCH --killable
+#SBATCH --requeue
 # Make sure to give array size with --array=1-x/2 (for example: --array=1-50 for 100 simulations)
 
 if ($#argv != 3) then
