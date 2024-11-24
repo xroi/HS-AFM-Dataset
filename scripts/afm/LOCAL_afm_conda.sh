@@ -11,7 +11,9 @@ endif
 
 set AFM_SIM_PATH=/cs/labs/ravehb/roi.eliasian/NpcTransportExperiment/HS-AFM-Simulation/
 
-source $AFM_SIM_PATH/venv_new/bin/activate.csh
+# Setup Environment
+source /cs/labs/ravehb/roi.eliasian/miniconda3/etc/profile.d/conda.csh
+conda activate general_notebooks
 
 set INPUT_PATH=$1/
 set OUTPUT_PATH=$2

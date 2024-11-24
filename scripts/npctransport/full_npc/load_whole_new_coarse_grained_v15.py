@@ -648,10 +648,14 @@ def get_coarse_grained_obstacles(obstacles):
             #            max_allowed_error_A= 1.5 * (dXY_by_Z/150.0)**1.15
             max_allowed_error_A = min(50.0, max_allowed_error_A)
             max_allowed_error_A = math.ceil(max_allowed_error_A / 2.0) * 2.0
-            s = IMP.algebra.Sphere3D(coord, radius)
+            s = IMP.algebra.Sphere3D(coord, radius) 
             in_obstacles[max_allowed_error_A].append(s)
     intermediate_obstacles = []
     for max_allowed_error_A, spheres in in_obstacles.items():
+        print("===================DEBUG-BEG===================")
+        print(max_allowed_error_A)
+        print(spheres)
+        print("===================DEBUG-END===================")
         intermediate_obstacles = intermediate_obstacles + \
                                  IMP.algebra.get_simplified_from_volume(spheres, max_allowed_error_A)
     out_obstacles = defaultdict(list)
