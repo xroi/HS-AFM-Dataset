@@ -18,9 +18,9 @@ config.time_step_factor.lower = 2.0
 config.slack.lower = 10
 config.number_of_trials = 1
 config.statistics_interval_ns = 1
-config.dump_interval_ns = 10
-config.output_statistics_interval_ns = 10
-config.simulation_time_ns = 1000
+config.dump_interval_ns = 100
+config.output_statistics_interval_ns = 10000 # was 100 for standard hdf (afm)
+config.simulation_time_ns = 10000
 config.box_is_on.lower = 1
 config.box_side.lower = 1500
 config.slab_is_on.lower = 2
@@ -94,38 +94,6 @@ for i in range(len(fgs)):
                                                         interaction_k=0.5*(self_k_N if suffix0=="_N" else self_k_C) + 0.5*(self_k_N if suffix1=="_N" else self_k_C),
                                                         interaction_range=self_range)
             interactionFG_FG.nonspecific_k.lower = np.sqrt((self_nonspec_k_N if suffix0=="_N" else self_nonspec_k_C) * (self_nonspec_k_N if suffix1=="_N" else self_nonspec_k_C))
-
-
-#############
-# Add NTRs: #
-#############
-
-ntr_vals = [(30,5)]
-ntrs = []
-for vals in ntr_vals:
-    cur_ntr  = IMP.npctransport.add_float_type(config,
-                                number=400,
-                                radius=vals[0],
-                                type_name=f"NTR{vals[0]}",
-                                interactions=vals[1],
-                                d_factor=1.0,
-                                interaction_k_factor=1.0,
-                                interaction_range_factor=1.0)
-    ntrs.append(cur_ntr)
-
-############################
-# Add NTR-FG interactions: #
-############################
-for i in range(len(fgs)):
-    for vals in ntr_vals:
-        for suffix in ["_N", "_C"]:
-            IMP.npctransport.add_interaction(config,
-                                     name0=f"fg{i}{suffix}",
-                                     name1=f"NTR{vals[0]}",
-                                     interaction_k=2.64,
-                                     interaction_range=5.5,
-                                     range_sigma0_deg=45.0,
-                                     range_sigma1_deg=45.0)
 
 # dump to file
 f = open(outfile, "wb")

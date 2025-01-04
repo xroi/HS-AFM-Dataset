@@ -1,8 +1,8 @@
 --no-npc-simulation
 --input-suffix .hdf5.gz
 --read-from-gzip
---simulation-start-time-ns 2000
---simulation-end-time-ns 46000
+--simulation-start-time-ns 72100
+--simulation-end-time-ns 102010
 --interval-ns 1
 --voxel-size-a 10
 --tunnel-radius-a 540
@@ -23,11 +23,11 @@
 --calc-threshold-frac 0.75
 --tip-radius-px 1
 --floaters-resistance
---fgs-sigma-a 117.738
+--fgs-sigma-a 0
 --floaters-sigma-a 96.369
 --floater-size-factor 1
 --floater-distribution-factor 1
---floater-general-factor 3.7888
+--floater-general-factor 7370.2830
 --time-per-pixel-ns 1
 --time-between-scans-ns 0
 --output-gif-color-map jet
@@ -46,4 +46,4 @@
 --no-output-post
 
 --no-fgs-verticality-weights
---tip-custom-threshold 0.5
+--tip-custom-threshold 0.6

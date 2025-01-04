@@ -1,5 +1,5 @@
 #!/bin/csh -f
-#SBATCH --mem=4g
+#SBATCH --mem=8g
 #SBATCH --time=7-0
 
 if ($#argv != 3) then

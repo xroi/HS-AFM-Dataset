@@ -1,0 +1,442 @@
+# Use the following as a reference for the parameters required for the IMP npctransport module.
+
+
+syntax="proto2";
+
+package npctransport_proto;
+
+message Configuration {
+  message XYZ {
+  // XYZ coordinates for a particle etc.
+    required double x=1;
+    required double y=2;
+    required double z=3;
+  };
+  message IntRange {
+    // a range from lower to upper with specified number of steps
+    required int32 lower=1;
+    optional int32 upper=2;
+    optional int32 steps=3;
+    optional double base=4; // positive logarithmic base or 1 - see FloatRange.  Float intermediate values will be rounded
+  };
+  message FloatRange {
+    // a range from lower to upper with specified number of steps
+    // evenly-spaced on a logarithmic space with specified base.
+    // if base == 1, standard uniform spacing is used
+    required double lower=1;
+    optional double upper=2;
+    optional int32 steps=3;
+    optional double base=4;
+  };
+  message FGConfiguration {
+    required IntRange number_of_beads=1;
+    required IntRange number=2;
+    required FloatRange radius=3;
+    required IntRange interactions=4; // # sites ; if i=-1 then FG bead is itself a site
+    required FloatRange rest_length_factor=5;
+    required FloatRange d_factor=6;
+    required FloatRange interaction_k_factor=7;
+    required FloatRange interaction_range_factor=8;
+    repeated XYZ anchor_coordinates=9; // a fixed coordinate for the first bead in the chain
+    optional string type=10; // type name, e.g. "fg_nsp1"
+    optional int32 is_tamd=11 [default=0]; // option for using a tamd restraint
+    optional FloatRange tamd_T_factor_coeff=12; // coefficient for accelerated temperature for TAMD particles
+    optional FloatRange tamd_T_factor_base=13; // base for accelerate temperature exponentiation for TAMD particles
+    optional FloatRange tamd_F_factor_coeff=14;// coefficient for increased friction for TAMD particles
+    optional FloatRange tamd_F_factor_base=15;// base for increased friction exponentiation for TAMD particles
+    optional FloatRange tamd_K=16; // spring constant for TAMD particles
+    optional double site_relative_distance=17 [default=1.0]; // distance of sites from center relative to particle radius
+    optional double site_radius=18 [default=0.0]; // radius around site within which maximal interaction energy xis felt
+    repeated string type_suffix_list=19; // list of suffixes appended to the end of the type field in corresponding chain particles. The list length is, assumed to be either 0 (=ignore) or the number of chain particles. Set to "" for particles that should not be modified. This enables customization of the interaction properties of different chain particles. Note that 'interaction_k_factor', 'interaction_range_factor', 'd_factor', 'interactions' fields are all ignored for particles whose suffix is not "".
+  };
+  message FloatConfiguration {
+    required IntRange number=1;
+    required FloatRange radius=2;
+    required IntRange interactions=3;
+    required FloatRange d_factor=4;
+    required FloatRange interaction_k_factor=7;
+    required FloatRange interaction_range_factor=8;
+    optional string type=9; // type name, e.g. "kap121"
+    optional FloatRange k_z_bias=10; // if non-0, add a biasing constant force pulling to lower (k>0) or higher (k<0)
+    optional FloatRange k_z_bias_fraction=11; // fraction of particles that will get the z-bias, meaningful if in (0,1]
+    optional double site_relative_distance=12 [default=1.0]; // distance of sites from center relative to particle radius
+    optional double site_radius=13 [default=0.0]; // radius around site within which maximal interaction energy is felt
+    optional int32 beads_tail_n=14 [default=0]; // NOT IMPLEMENTED - option for a tail of beads, 0 for none
+    optional double beads_tail_radius=15 [default=0]; // NOT IMPLEMENTED - radius of tail beads
+    optional double beads_tail_k=16 [default=1.0]; // NOT IMPLEMENTED - k for tail springs;
+    optional double beads_tail_bond_length=17 [default=1.0]; // NOT IMPLEMENTED - length of bond between beads
+    repeated XYZ site_coordinates=18; // coordinates of interaction sites relative to sphere center, valid if length is zero or equals to interactions field. Overrides site_relative distance
+  };
+  message ObstacleConfiguration {
+    repeated XYZ xyzs=1; // center of mass of each such obstacle (also sets the number)
+    required FloatRange radius=2;
+    required IntRange interactions=3;
+    required int32 is_static=4 [default=1];
+    required FloatRange d_factor=5; // diffusion factor for scaling the default coefficient from Stokes radius interpretation of 'radius', relevant only if is_static=0
+    required FloatRange interaction_k_factor=6;
+    required FloatRange interaction_range_factor=7;
+    required string type=8; // type name, e.g. "nup53"
+  };
+  message Interaction {
+    // is range_sigma_0/1 are positive, uses non-isotropic interaction mechanism, maximal energy drop of (0.25*k*range^2)
+    // if either of range_sigma_0/1 is zero, uses isotropic linear interaction, maximal energy drop of (k*range)
+    required string type0=1; // site 0 type name, e.g., "fg_nsp1"
+    required string type1=2; // site 1 type name, e.g., "kap121"
+    required IntRange is_on=3;
+    optional FloatRange interaction_k=4; // if obsoltete decomposition to normal and tangent components, this is kN*kT
+    optional FloatRange interaction_range=5; // if obsolete decomposition to normal and tangent component, this is sqrt(rN^2+rT^2)
+    optional FloatRange k_tangent_skew=6; // obsolete
+    optional FloatRange range_tangent_skew=7; // obsolete
+    optional FloatRange range_sigma0_deg=8; // maximal angle around site0 with active attraction (0.0 for isotropic interaction between site-centers)
+    optional FloatRange range_sigma1_deg=9; // maximal angle around site1 with active attraction (0.0 for isotropic interaction between site centers)
+    optional FloatRange nonspecific_range=10; // range in A of non-specific attraction between the two beads (outside interaction sites), overriding the default if specified
+    optional FloatRange nonspecific_k=11; // force constant in kcal/mol/A of non-specific attraction between the two beads (outside interaction sites), overriding the default if specified
+    optional FloatRange excluded_volume_k=12; // force constant in kcal/mol/A of excluded volume repulsion between the two beads overriding the default if specified
+    repeated int32 active_sites0=13; // site ids of interaction sites on type 0, if empty - use all
+    repeated int32 active_sites1=14; // site ids of interaction sites on type 1, if empty - use all
+  };
+
+  required FloatRange interaction_k=3; // default k for specific interactions
+  required FloatRange interaction_range=4; // default range of specific interactions
+  required FloatRange backbone_k=5;
+  required FloatRange time_step_factor=6;
+  required FloatRange box_side=7; // TODO: in future replace with bounding volume?
+  required IntRange box_is_on=8; // 0=no; 1=box; 2=sphere with volume equals box_side^3
+  required FloatRange slab_thickness=9;
+  required FloatRange tunnel_radius=10;
+  required IntRange slab_is_on=11; // 0=no; 1=cylinder; 2=torus with major radius tunnel_radius and minor radius 0.5*slab_thickness
+  required FloatRange slack=12;
+  required int32 number_of_trials=13;
+  required double maximal_number_of_frames=14;
+  repeated FGConfiguration fgs=15;
+  repeated FloatConfiguration floaters=16;
+  repeated ObstacleConfiguration obstacles=27;
+  repeated Interaction interactions=17;
+  required double dump_interval_ns=18; // 0 = every frame; this is the interval at which the output trajectory file is updated, if applicable
+  required FloatRange nonspecific_range=19; //default range in A of non-specific interaction between pairs of beads
+  required FloatRange nonspecific_k=20; //default force coefficient in kcal/mol/A of non-specific interaction between pairs of beads
+  required FloatRange angular_D_factor=21;
+  required double statistics_interval_ns=22; // 0 = every frame; this is the interval at which statistics are monitored during the run (but not necessarily output to file)
+  required FloatRange excluded_volume_k=23; // default force coefficient in kcal/mol/A of repulsion between pairs of beads
+  required double simulation_time_ns=24;
+  // percent of time in actual running (as opposed to equlibration):
+  required FloatRange statistics_fraction=25;
+  optional double maximum_number_of_minutes=26;
+  optional double fg_anchor_inflate_factor=28 [default=1.0]; // by how much to inflate static anchors of fg chains
+  optional int32 are_floaters_on_one_slab_side=29 [default=0]; // if true (<>0), all floaters are initially concentrated on one side
+  optional FloatRange time_step_wave_factor=30; // if >1.001, use a wave function for time step that allows going beyond formal maximal step in waves
+  optional int32 is_exclude_floaters_from_slab_initially=31 [default = 1];
+  optional double output_statistics_interval_ns=32 [default = 100]; // update interval of statistics file (including order params). 
+                                                                    // The output protobuf file is updated every output_statistics_interval_ns
+                                                                    // NOTE: it may be that the default is 1.0 for some reason and not as specified here - this is something we need to verify
+  optional FloatRange temperature_k=33; // simulation temperature
+  optional double output_npctransport_version=34 [default=5.0]; // a version number of npctransport by which to create output files
+  optional int32 is_xyz_hist_stats=35 [default=1]; // whether to use an xyz histogram instead of zr histogram (= whether to project x and y to sqrt(x^2+y^2)
+  optional double xyz_stats_crop_factor=40 [default=0.5]; // percentage of box to crop from each axis for xyz histogram (symmetrically), before adding 5 voxels for slack on each side
+  optional double xyz_stats_voxel_size_a=41 [default=10.0]; // size of voxel in A for xyz histogram
+  optional double xyz_stats_max_box_size_a=42 [default=1000.0]; // maximal size of box for xyz stats (before applying crop factor and adding 5 voxels for slack on each side)
+  optional FloatRange tunnel_radius_k=36; // (Version 2.5+) if <=0, static radius, otherwise, k force constant for tunnel radius restraint
+  optional FloatRange pore_anchored_beads_k=37; // (Version 2.5+) if <=0, static anchors, otherwise, k force constant for beads anchored to pore
+  optional int32 is_backbone_harmonic=38 [default=0]; // whether backbone is an harmonic or linear potential
+  optional FloatRange backbone_tau_ns=39; // backbone relaxation time for two beads connected by a harmonic spring (relevant only is is_backbone_harmonic is true)
+  optional int32 is_multiple_hdf5s=43;  // if true, output new hdf5 every output_statistics_interval_ns, 
+                                        // then add a numeric suffix to hdf5 for each dump
+                                        // e.g. output_1.pb.hdf5, output_2.pb.hdf5, etc. Default is only once in the end.
+  optional int32 full_output_statistics_interval_factor=44 [default=1]; // if >1, output full output file every output_statistics_interval_ns*full_output_interval_factor 
+  // n=44
+  }
+
+// if you add any parameters you must update automatic_parameters.cpp
+// accordingly
+message Assignment {
+  message XYZ {
+  // XYZ coordinates for a particle etc.
+    required double x=1;
+    required double y=2;
+    required double z=3;
+  };
+  message IntAssignment {
+    required int32 value=1;
+    optional int32 index=2;
+  };
+  message FloatAssignment {
+    required double value=1;
+    optional int32 index=2;
+  };
+  message FGAssignment {
+    required IntAssignment number_of_beads=1;
+    required IntAssignment number=2;
+    required FloatAssignment radius=3; // also sets the rest length (to 2xradius)
+    required IntAssignment interactions=4;
+    required FloatAssignment rest_length_factor=5;
+    required FloatAssignment d_factor=6;
+    required FloatAssignment interaction_k_factor=7;
+    required FloatAssignment interaction_range_factor=8; // by how much to increase the rest length from 2xradius
+    repeated XYZ anchor_coordinates=9; // a fixed coordinate for the first bead in the chain
+    optional string type=10; // e.g., "fg_nsp1"
+    optional int32 is_tamd=11 [default=0]; // option for using a tamd restraint
+    optional FloatAssignment tamd_T_factor_coeff=12;
+    optional FloatAssignment tamd_T_factor_base=13;
+    optional FloatAssignment tamd_F_factor_coeff=14;
+    optional FloatAssignment tamd_F_factor_base=15;
+    optional FloatAssignment tamd_K=16;
+    optional double site_relative_distance=17 [default=1.0]; // distance of sites from center relative to particle radius
+    optional double site_radius=18 [default=0.0]; // radius around site at which maximal interaction is felt
+    repeated string type_suffix_list=19; // list of suffixes appended to the end of the type field in corresponding chain particles. The list length is, assumed to be either 0 (=ignore) or the number of chain particles. Set to "" for particles that should not be modified. This enables customization of the interaction properties of different chain particles. Note that 'interaction_k_factor', 'interaction_range_factor', 'd_factor', 'interactions' fields are all ignored for particles whose suffix is not "".
+    optional double backbone_k_factor=20 [default=1.0]; // FOR NOW - does nothing!!!!!
+  };
+  message FloaterAssignment {
+    required IntAssignment number=1;
+    required FloatAssignment radius=2;
+    required IntAssignment interactions=3;
+    required FloatAssignment d_factor=4;
+    required FloatAssignment interaction_k_factor=5;
+    required FloatAssignment interaction_range_factor=7;
+    optional string type=8; // e.g., "kap121"
+    optional FloatAssignment k_z_bias=9; // if non-0, add a biasing constant force pulling to lower (k>0) or higher (k<0)
+    optional FloatAssignment k_z_bias_fraction=11; // fraction of particles that will get the z-bias, meaningful if in (0,1]
+    optional double site_relative_distance=12 [default=1.0]; // distance of sites from center relative to particle radius
+    optional double site_radius=13 [default=0.0]; // radius around site at which maximal interaction is felt
+    optional int32 beads_tail_n=14 [default=0]; // option for a tail of beads, 0 for none
+    optional double beads_tail_radius=15 [default=0]; // radius of tail beads
+    optional double beads_tail_k=16 [default=1.0]; // k for tail springs;
+    optional double beads_tail_bond_length=17 [default=1.0]; // length of bond between beads
+    repeated XYZ site_coordinates=18; // coordinates of interaction sites relative to sphere center, valid if length is zero or equals to interactions field. If specified, overrides site_relative_distance
+
+  };
+  message ObstacleAssignment {
+    repeated XYZ xyzs=1; // center of mass of each such obstacle (also sets the number)
+    required FloatAssignment radius=2;
+    required IntAssignment interactions=3;
+    required int32 is_static=4 [default=1];
+    required FloatAssignment d_factor=5; // diffusion factor for scaling the default coefficient from Stokes radius interpretation of 'radius'
+    required FloatAssignment interaction_k_factor=6;
+    required FloatAssignment interaction_range_factor=7;
+    required string type=8; // type name, e.g. "nup53"
+  };
+  message InteractionAssignment {
+    required string type0=1; // e.g., "fg_nsp1"
+    required string type1=2; // e.g., "kap121"
+    required IntAssignment is_on=3;
+    optional FloatAssignment interaction_k=4;
+    optional FloatAssignment interaction_range=5;
+    optional FloatAssignment k_tangent_skew=6; // skew of k towards (or against) tangent direction, namely kT/kN (1 = no skew ; 0 = old algo for backward comp)
+    optional FloatAssignment range_tangent_skew=7; // ske of range towards (or against) tangent direction, namely rangeT/rangeN (1 = no skew ; 0 = old algo for backward comp)
+    optional FloatAssignment range_sigma0_deg=8; // maximal angle around site0 with active attraction (if not defined, then use isotropic interaction between site centers with constant k)
+    optional FloatAssignment range_sigma1_deg=9; // maximal angle around site1 with active attraction (if not defined, then use isotropic interaction between site centers with constant k)
+    optional FloatAssignment nonspecific_range=10; // range in A of non-specific attraction between the two beads (outside interaction sites), overriding the default if specified
+    optional FloatAssignment nonspecific_k=11; // force constant in kcal/mol/A of non-specific attraction between the two beads (outside interaction sites), overriding the default if specified
+    optional FloatAssignment excluded_volume_k=12; // force constant in kcal/mol/A of excluded volume repulsion between the two beads overriding the default if specified
+    repeated int32 active_sites0=13; // site ids of interaction sites on type 0, if empty - use all
+    repeated int32 active_sites1=14; // site ids of interaction sites on type 1, if empty - use all
+  };
+  required int32 work_unit=1;
+  required FloatAssignment interaction_k=3;
+  required FloatAssignment interaction_range=4;
+  required FloatAssignment backbone_k=5;
+  required FloatAssignment time_step_factor=6;
+  // length of the side of a box
+  required FloatAssignment box_side=7;
+  required IntAssignment box_is_on=8;
+  required FloatAssignment slab_thickness=9;
+  required FloatAssignment tunnel_radius=10;
+  required IntAssignment slab_is_on=11; // 0=no; 1=cylinder; 2=torus with major radius tunnel_radius and minor radius 0.5*slab_thickness
+  required FloatAssignment slack=12;
+  required int32 number_of_trials=13;
+  required double maximal_number_of_frames=14;
+  repeated FGAssignment fgs=15;
+  repeated FloaterAssignment floaters=16;
+  repeated ObstacleAssignment obstacles=33;
+  repeated InteractionAssignment interactions=17;
+  required double dump_interval_ns=18; // 0 = every frame
+  required FloatAssignment nonspecific_range=19;
+  required FloatAssignment nonspecific_k=20;
+  required FloatAssignment angular_D_factor=21;
+  required double statistics_interval_ns=22; // 0 = every frame
+  required FloatAssignment excluded_volume_k=23;
+  required int32 number_of_frames=24; // = simulation_time_ns * 1e+6 / time_step
+  required double time_step=25; // in femtoseconds (IMP default)
+  required double range=26;
+  required double simulation_time_ns=27;
+  required double statistics_interval_frames=28; // = statistics_interval_ns * 1e+6 / time_step
+  required double dump_interval_frames=29; // = dump_interval_ns * 1e+6 / time_step
+  required FloatAssignment statistics_fraction=30;
+  optional double maximum_number_of_minutes=31;
+  optional uint64 random_seed = 32; // random seed used to initialize this run
+  optional double fg_anchor_inflate_factor=34 [default=1.0]; // by how much to inflate the anchor of FG nups (= structural nup)
+  optional int32 are_floaters_on_one_slab_side=35 [default=0]; // if true (<>0), all floaters are initially concentrated on one side
+  optional FloatAssignment time_step_wave_factor=36; // if >1.001, use a wave function for time step that allows going beyond formal maximal step in waves
+  optional int32 is_exclude_floaters_from_slab_initially=37 [default = 1];
+  repeated string imp_module_version=38; // repeated - once for each restart
+  repeated string npc_module_version=39; // repeated - once for each restart
+  optional double output_statistics_interval_ns=40 [default=100]; // update interval of statistics file (including order params) in ns
+  optional int32 output_statistics_interval_frames=41 [default=100000]; // update interval of statistics file (including order params) in frames
+  optional FloatAssignment temperature_k=42; // simulation temperature
+  optional double output_npctransport_version=43; // a version number for npctransport by which to interpret output file that contains this assignment
+  optional int32 is_xyz_hist_stats=44 [default=1]; // whether to use an xyz histogram instead of zr histogram (= whether to project x and y to sqrt(x^2+y^2); if so output ot HDF5 file
+  optional double xyz_stats_crop_factor=49 [default=0.5]; // percentage of box to crop from each axis for xyz histogram (symmetrically). 
+  optional double xyz_stats_voxel_size_a=50 [default=10.0]; // size of voxel in A for xyz histogram
+  optional double xyz_stats_max_box_size_a=51 [default=1000.0]; // maximal size of box for xyz stats
+  optional FloatAssignment tunnel_radius_k=45; // (Version 2.5+) if <=0, static radius, otherwise, k for tunnel radius restraint
+  optional FloatAssignment pore_anchored_beads_k=46; // (Version 2.5+) if <=0, static anchors, otherwise, k force constant for beads anchored to pore
+  optional int32 is_backbone_harmonic=47 [default=1]; // whether backbone is an harmonic or linear potential
+  optional FloatAssignment backbone_tau_ns=48; // (version 3.0+) backbone relaxation time for two beads connected by a harmonic spring (relevant only is is_backbone_harmonic is true)
+  optional int32 is_multiple_hdf5s=52;  // if true, output new hdf5 every output_statistics_interval_ns, 
+                                        // then add a numeric suffix to hdf5 for each dump
+                                        // e.g. output_1.pb.hdf5, output_2.pb.hdf5, etc. Default is only once in the end.
+    optional int32 full_output_statistics_interval_factor=53 [default=1]; // if >1, output full output file every output_statistics_interval_ns*full_output_interval_factor 
+  // n=53
+}
+
+message Statistics {
+  message Ints { // list of ints
+     repeated int32 ints=1;
+  }
+  message Ints_list { // list of list of ints
+          repeated Ints ints_list=1;
+  }
+  message Ints_lists { // 3D matrix of ints
+          repeated Ints_list ints_lists= 1;
+  }
+
+  message FGOrderParams {
+    required double time_ns=1;
+    required double volume=2;
+    optional double mean_radius_of_gyration=3;
+    optional double mean_square_radius_of_gyration=5;
+    optional double mean_end_to_end_distance=4;
+    optional double mean_square_end_to_end_distance=6;
+    optional double fraction_chains_bound=7;
+    optional double floaters_per_interacting_chain=8;
+    optional double mean_bond_distance=9;
+    optional double mean_square_bond_distance=10;
+  }
+  message FloaterOrderParams {
+    required double time_ns=1;
+    required double site_interactions_per_floater=2;
+    optional float interacting_fraction=9;
+    required double beads_per_interacting_floater=3;
+    required double chains_per_interacting_floater=4;
+    optional int32 n_z0=5;
+    optional int32 n_z1=6;
+    optional int32 n_z2=7;
+    optional int32 n_z3=8;
+    optional float diffusion_coefficient=10;
+  }
+  message FGStats {
+    optional double volume=1 [default=0];
+    optional double length=2 [default=0];
+    optional double radius_of_gyration=3 [default=0];
+    optional double particle_diffusion_coefficient=4 [default=0]; // Obsolete from version 4.0- moved to FGBodyStats
+    optional double particle_correlation_time=5 [default=0]; // Obsolete from version 4.0 - moved to FGBodyStats
+    optional double chain_diffusion_coefficient=6 [default=0];
+    optional double chain_correlation_time=7 [default=0];
+    optional double local_diffusion_coefficient=8 [default=0];
+    optional string type=9; // type name, e.g. "fg_nsp1"
+    repeated FGOrderParams order_params=10;
+    optional  Ints_list zr_hist=11; // Obsolete from version 4.0 - moved to FGBodyStats
+    optional  Ints_lists xyz_hist=12; // Obsolete from version 4.0 - moved to FGBodyStats
+  }
+  message FGBeadStats { // (version>=4.0)
+    optional double particle_diffusion_coefficient=1 [default=0];
+    optional double particle_correlation_time=2 [default=0];
+    optional string type=3; // type name, e.g. "fg_nsp1"
+    optional Ints_list zr_hist=4; // histogram of z (dimension 1) and r(dimension 2) coordinates (or z,y,x if is_xyz_hist_stats)
+    optional Ints_lists xyz_hist=5; // histogram of x,y,z (dimension 0, 1 and 2, resp.)
+  }
+  message FloatStats {
+    //    optional double site_interactions_per_floater=1 [default=0]; // number of site interactions per floater
+    //  optional double interacting_fraction=2 [default=0];   // fraction of floaters in interaction
+    // optional double chains_per_interacting_floater=3 [default=0]; // number of FG chain per interacting floater
+    // optional double beads_per_interacting_floater=4 [default=0]; // number of FG beads per interacting floater
+    optional double diffusion_coefficient=5 [default=0];
+    optional double correlation_time=6 [default=0];
+    optional double avg_n_transports=7 [default=0]; // avg number of times a particle of this type has crossed the channel
+    repeated double transport_time_points_ns=8; // records the time points of transports in simulation time (TODO: assuming single trial?)
+    optional string type=9; // type name, e.g. "kap121"
+    repeated FloaterOrderParams order_params=10;
+    optional  Ints_list zr_hist=11; // histogram of z (dimension 1) and r (dimension 2) coordinates (or z,y,x if is_xyz_hist_stats)
+    optional  Ints_lists xyz_hist=12; // histogram of x,y,z (dimension 0, 1 and 2, resp.)
+  }
+  message InteractionOrderParams{
+    required float time_ns=1;
+    // all averages since last statistics update
+    optional float avg_off_per_contact_per_ns=2; // off rate per particle-particle contact
+    optional float avg_off_per_bound_i_per_ns=3; // off rate per bound partricles of type i
+    optional float avg_off_per_bound_ii_per_ns=4; // off rate per bound partricles of type ii
+    optional float off_stats_period_ns=5;
+    optional float avg_on_per_missing_contact_per_ns=6; // on rate per missing particle-particle contact
+    optional float on_stats_period_ns=7;
+    optional float avg_on_per_unbound_i_per_ns=8;  // on rate per unbound particle of type i
+    optional float on_i_stats_period_ns=9;
+    optional float avg_on_per_unbound_ii_per_ns=10; // on rate per unbound particle of type ii
+    optional float on_ii_stats_period_ns=11;
+    optional float avg_contacts_per_particle_i=12;
+    optional float avg_contacts_per_particle_ii=13;
+    optional float avg_fraction_bound_particles_i=14;
+    optional float avg_fraction_bound_particles_ii=15;
+    optional float misc_stats_period_ns=16;
+    optional float off_i_stats_period_ns=17;
+    optional float off_ii_stats_period_ns=18;
+    optional float on_per_unbound_chain_i_per_unbound_chain_ii_per_ns=19; // UNIMPLEMENTED
+    optional float off_per_bound_pair_of_chains=20; // UNIMPLEMENTED
+    optional float avg_fraction_bound_particle_sites_i=21;
+    optional float avg_fraction_bound_particle_sites_ii=22;
+    optional float avg_fraction_nonspecific_interactions_i=23;
+    optional float avg_fraction_nonspecific_interactions_ii=24;
+  }
+  message InteractionStats {
+    required string type0=1;
+    required string type1=2;
+    optional double avg_contacts_per_particle0=3;
+    optional double avg_contacts_per_particle1=4;
+    optional double avg_pct_bound_particles0=5;
+    optional double avg_pct_bound_particles1=6;
+    repeated InteractionOrderParams order_params=7;
+  }
+  message GlobalOrderParams {
+    required double time_ns=1;
+    required double energy=2;
+    repeated Ints zr_hists=3;
+  }
+  repeated FGStats fgs=1; // statistics about entire FG chain types
+  repeated FloatStats floaters=2;
+  optional double energy_per_particle=3 [default=0];
+  optional int32 number_of_frames=4 [default=0]; // number of frames for which statistics were gathered
+  optional double seconds_per_iteration=5 [default=0]; // overall time in seconds for this statistics iteration
+  repeated InteractionStats interactions=6;
+  optional int32 interrupted=7 [default=0];
+  optional double bd_simulation_time_ns=8 [default=0]; // number of ns in which BD simulation was running
+  repeated GlobalOrderParams global_order_params=9;
+  repeated FGBeadStats fg_beads=10; // (version>=4.0) statistics about specific types of FG beads in a chain (e.g. Nsp1-FG124)
+}
+
+message Conformation {
+  message Coordinates {
+    required double x=1;
+    required double y=2;
+    required double z=3;
+  };
+  message Sites {
+     required string name=1;
+     repeated Coordinates coordinates=2;
+  };
+  repeated Sites sites=1;
+  message Particle {
+    required double x=1;
+    required double y=2;
+    required double z=3;
+    required double r=4;
+    required double i=5;
+    required double j=6;
+    required double k=7;
+  };
+  repeated Particle particle=2;
+};
+
+message Output {
+  required Assignment assignment=1;
+  required Statistics statistics=2;
+  optional Conformation conformation=3;
+  optional bytes rmf_conformation=4;
+}
